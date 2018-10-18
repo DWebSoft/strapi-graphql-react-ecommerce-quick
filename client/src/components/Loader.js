@@ -3,7 +3,6 @@ import { GridLoader } from "react-spinners";
 import { Box } from "gestalt";
 
 const Loader = ({show})=> {
-    console.log(show) 
     return (
         show && <Box
         position="fixed"

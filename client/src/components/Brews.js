@@ -55,7 +55,6 @@ class Brews extends React.Component {
 
     addToCart = brew => {
         const alreadyInCart = this.state.cartItems.findIndex( item => item._id === brew._id );
-        console.log(alreadyInCart);
         if ( alreadyInCart === -1 ) {
             const updatedItems = this.state.cartItems.concat({
                 ...brew,
