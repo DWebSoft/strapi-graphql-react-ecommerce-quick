@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, Button, Container, Heading, TextField } from "gestalt";
+import { Box, Text, Button, Container, Heading, TextField, Modal, Spinner } from "gestalt";
 import Toast from "./Toast";
 import { getCart, calculatePrice } from "./../utils";
 
@@ -13,7 +13,9 @@ class Checkout extends React.Component {
         orderConfimationEmail: "",
         toast: false,
         toastMessage: "",
-        loading: false
+        loading: false,
+        orderProcessing: true,
+        modal: false
     }
 
     componentDidMount() {
@@ -43,7 +45,10 @@ class Checkout extends React.Component {
             //show toast message
             this.showToast('Error registering user');
         }
+        this.setState({modal: true});
     }
+
+    handleSubmitOrder = () => {}
 
     isFormEmpty = ({ address, postalCode, city, orderConfimationEmail }) => {
         return !address || !city || !postalCode || !orderConfimationEmail;
@@ -56,9 +61,10 @@ class Checkout extends React.Component {
         }, 5000);
     }
 
+    closeModal = () => this.setState({ modal: false });
 
     render() {
-        const { toast, toastMessage, cartItems } = this.state;
+        const { toast, toastMessage, cartItems, modal, orderProcessing } = this.state;
         return (
             <Container>
                 <Box
@@ -153,10 +159,71 @@ class Checkout extends React.Component {
                         </Box>
                     )}
                 </Box>
+
+                {/* Confirmation Modal Area */}
+                { modal && (
+                    <ConfirmationModal 
+                    orderProcessing={orderProcessing}
+                    closeModal={this.closeModal}
+                    cartItems={cartItems}
+                    handleSubmitOrder={this.handleSubmitOrder}  />
+                )}
+
                 <Toast message={toastMessage} show={toast} />
             </Container>
         );
     }
 }
+
+const ConfirmationModal = ({orderProcessing, cartItems, closeModal, handleSubmitOrder}) => (
+    <Modal 
+        accessibilityCloseLabel="Close"
+        accessibilityModalLabel="Confirm Your Order"
+        heading="Confirm Your Order"
+        onDismiss={closeModal}
+        footer={
+            <Box display="flex" marginRight={-1} marginLeft={-1} justifyContent="center">
+                <Box padding={1}>
+                    <Button 
+                        size="lg" 
+                        color="red" 
+                        text="Submit" 
+                        disabled={orderProcessing}
+                        onClick={handleSubmitOrder} />    
+                </Box>
+                <Box padding={1}>
+                    <Button
+                        size="lg"
+                        text="Cancel"
+                        disabled={orderProcessing}
+                        onClick={closeModal} />
+                </Box>
+            </Box>
+        }
+        role="alertdialog"
+        size="sm"
+    >
+        <Box paddingY={2}> 
+            {/* Order Summary */}
+            { !orderProcessing && (
+                <Box color="lightWash" display="flex" justifyContent="center" alignItems="center" direction="column" padding={2}>
+                    {cartItems.map(item => (
+                        <Box key={item._id} padding={1} >
+                            <Text color="red" size="lg" >
+                                {item.name} x {item.quantity} - ${(item.quantity * item.price).toFixed(2)}
+                            </Text>
+                        </Box>
+                    ))}
+                    <Box paddingY={2}>
+                        <Text size="lg" bold>Total Amount: {calculatePrice(cartItems)}</Text>
+                    </Box>
+                </Box>
+            )}
+            {/* Order Processing Spineer */}
+            <Spinner show={orderProcessing} accessibilityLabel="Order Processing Spinner" />
+            {orderProcessing && <Text align="center" italic>Submitting Order...</Text>}
+        </Box>
+    </Modal>
+);
 
 export default Checkout;
