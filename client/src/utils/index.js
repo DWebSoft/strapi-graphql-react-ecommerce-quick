@@ -7,6 +7,12 @@ export const calculatePrice = (items) => {
         .toFixed(2)}`;
 }
 
+export const calculateAmount = (items) => {
+    return Number(items
+        .reduce((acc, item) => acc + item.quantity * item.price, 0)
+        .toFixed(2));
+}
+
 /* Cart functions */
 export const setCart = (value, cartKey = CART_KEY) => {
     if( localStorage ) {
@@ -35,7 +41,6 @@ export const getToken = (tokenKey = TOKEN_KEY) => {
     return null;
 }
 
-
 export const setToken = (value, tokenKey = TOKEN_KEY) => {
     if( localStorage ) {
         localStorage.setItem( tokenKey, JSON.stringify(value) );
@@ -47,3 +52,5 @@ export const clearToken = (tokenKey = TOKEN_KEY) => {
         localStorage.removeItem(tokenKey);
     }
 }
+
+//pk_test_wGWJGQ4UK9KmdzLMJPgGbo5O
